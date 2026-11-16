@@ -1,55 +1,37 @@
-# 일하는 베짱이 — AI 상세페이지 생성기 (무료 · Pollinations + Vercel)
+# 일하는 베짱이 — AI 상세페이지 생성기 (무료 · 정적 사이트)
 
 상품명·사진을 넣으면 AI가 **기획 초안 → 쿠팡 스타일 상세페이지 → AI 이미지**까지 만들어주는 웹앱입니다.
-카피·이미지 생성 모두 **무료 [Pollinations.ai](https://pollinations.ai)** 를 사용합니다. **API 키·결제수단 불필요.**
+카피·이미지 생성 모두 **무료 [Pollinations.ai](https://pollinations.ai)** 를 브라우저에서 직접 호출합니다.
+**서버·API 키·결제 전부 불필요** — `index.html` 하나로 동작하는 정적 사이트입니다.
 
 ## 구성
-
 ```
-index.html        프런트엔드 (전체 UI)
-api/copy.js        카피/기획 생성 (Pollinations 무료 텍스트)
-api/image.js       AI 이미지 생성 (Pollinations 무료 이미지)
-vercel.json        함수 실행 시간 설정
-package.json       Node 18+
-.env.example       (선택) 환경변수 예시 — 없어도 동작
+index.html   앱 전체 (HTML + CSS + JS, 외부 의존성 없음)
 ```
 
----
+## 배포 (GitHub Pages)
+이 저장소는 **GitHub Pages** 로 배포되어 있습니다.
+- 공개 주소: `https://<GitHub아이디>.github.io/detail-maker-ai/`
+- 코드를 바꾸면 `main` 에 push 하는 것만으로 1~2분 뒤 자동 반영됩니다.
 
-## 배포 순서 (약 5분, 전부 무료)
+> Pages가 꺼져 있다면: 저장소 **Settings → Pages → Source: `Deploy from a branch` → Branch: `main` / `/ (root)`** 저장.
+> (GitHub Pages 무료는 **공개 저장소**에서만 됩니다.)
 
-### 1. GitHub 저장소 (이미 완료)
-이 프로젝트는 비공개 저장소에 올라가 있습니다.
+## 로컬에서 열기
+`index.html` 을 더블클릭해 브라우저로 열면 바로 동작합니다(서버 불필요).
 
-### 2. Vercel에 배포
-1. https://vercel.com 에 **GitHub로 로그인**
-2. **Add New → Project → Import** 에서 이 저장소(`detail-maker-ai`) 선택
-3. 환경변수는 **설정할 필요 없음** (키가 필요 없습니다) → 바로 **Deploy**
-4. 1~2분 후 `https://<프로젝트>.vercel.app` 주소 완성
+## 사용 흐름
+1. 상품명 입력 + (선택) 사진 업로드 + 카테고리/길이 선택
+2. **AI로 기획 초안 만들기** → 섹션 구조 편집(순서·삭제·추가·문구 수정)
+3. **이대로 만들기** → 쿠팡 스타일 상세페이지 완성
+4. **🖼️ AI 이미지** → 섹션별 이미지 자동 생성 / 하단 채팅으로 **AI 수정**
+5. **⬇ 다운로드** 또는 **HTML 복사** 로 스토어 에디터에 사용
 
-끝입니다. 그 주소에서 **카피 생성 + AI 이미지 생성**이 모두 무료로 동작합니다.
+## 비용 / 품질
+- GitHub Pages·Pollinations **전부 무료**(키·결제 없음).
+- 무료 서비스라 유료 대비 **품질이 낮고 가끔 느리거나 실패**할 수 있습니다. 다시 누르면 됩니다.
+- 사용량 제한이 걸리면 `auth.pollinations.ai` 에서 무료 토큰을 받아 요청에 붙일 수 있습니다(코드 수정 필요).
 
----
-
-## 로컬 테스트 (선택)
-```bash
-npm i -g vercel
-vercel dev     # http://localhost:3000
-```
-> `index.html`만 브라우저로 열면 `/api/*` 함수가 없어 "결과 예시 먼저 보기"만 동작합니다.
-
----
-
-## 비용
-- **GitHub / Vercel(Hobby) / Pollinations: 전부 무료.** API 키·결제 없음.
-- Vercel Hobby 플랜은 개인용 기준입니다. 상업적으로 트래픽이 커지면 Pro 전환이 필요할 수 있습니다.
-
-## 품질 / 한도 참고
-- Pollinations는 무료 서비스라 **유료 OpenAI보다 품질이 낮고**, 가끔 **느리거나 결과가 들쭉날쭉**할 수 있습니다.
-- 사용량이 많아 제한이 걸리면, `auth.pollinations.ai` 에서 무료 토큰을 받아 Vercel 환경변수 `POLLINATIONS_TOKEN` 에 넣으면 한도가 늘어납니다.
-- 더 높은 품질이 필요해지면 `api/copy.js` · `api/image.js` 를 OpenAI/Google 유료 API로 교체할 수 있습니다(과금 발생).
-
-## 보안 / 주의
-- 이 앱엔 로그인·사용량 제한이 없습니다. 공개 URL로 두면 누구나 호출할 수 있으니,
-  필요하면 Vercel의 **Password Protection** 을 켜세요.
+## 주의
 - AI가 만든 **예시 후기**는 반드시 실제 후기로 교체하고, 생성된 문구·사양은 판매 전 사실 확인하세요.
+- 이미지는 Pollinations 주소로 들어갑니다. 완전한 오프라인 보관이 필요하면 내려받은 이미지를 직접 교체하세요.

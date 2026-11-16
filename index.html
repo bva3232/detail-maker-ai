@@ -368,18 +368,37 @@ function ph(label,h1,h2){
   return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
 }
 
-/* ---------- API ---------- */
-async function callCopy(prompt){
-  var r=await fetch('/api/copy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
-  var data=await r.json();
-  if(!r.ok) throw new Error(data.error||('서버 오류 '+r.status));
-  return data;
+/* ---------- API (Pollinations 무료 · 브라우저에서 직접 호출, 서버 불필요) ---------- */
+function extractJSON(text){
+  if(!text) return null;
+  text=String(text).replace(/```json\s*/gi,'').replace(/```/g,'').trim();
+  try{return JSON.parse(text);}catch(e){}
+  var s=text.indexOf('{'),e=text.lastIndexOf('}');
+  if(s>=0&&e>s){try{return JSON.parse(text.slice(s,e+1));}catch(e2){}}
+  return null;
 }
-async function callImage(prompt){
-  var r=await fetch('/api/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
-  var data=await r.json();
-  if(!r.ok) throw new Error(data.error||('서버 오류 '+r.status));
-  return data.dataUrl;
+async function callCopy(prompt){
+  var r=await fetch('https://text.pollinations.ai/openai',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'openai',messages:[
+      {role:'system',content:'너는 한국 이커머스(쿠팡/스마트스토어) 상세페이지 전문 기획자다. 반드시 유효한 JSON 객체만 반환한다. 설명/코드블록 금지.'},
+      {role:'user',content:prompt}],response_format:{type:'json_object'},temperature:0.85,private:true,referrer:'detail-maker-ai'})});
+  var raw=await r.text();
+  if(!r.ok) throw new Error('AI 호출 오류('+r.status+'). 잠시 후 다시 시도해 주세요.');
+  var content=raw;
+  try{var j=JSON.parse(raw);if(j&&j.choices&&j.choices[0]&&j.choices[0].message)content=j.choices[0].message.content;}catch(e){}
+  var parsed=extractJSON(content)||extractJSON(raw);
+  if(!parsed) throw new Error('AI 응답을 해석하지 못했어요. 다시 시도해 주세요.');
+  return parsed;
+}
+function callImage(prompt){
+  var seed=Math.floor(Math.random()*1000000);
+  var url='https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt)+'?width=1024&height=1024&nologo=true&model=flux&seed='+seed;
+  return new Promise(function(resolve,reject){
+    var im=new Image();
+    im.onload=function(){resolve(url);};
+    im.onerror=function(){reject(new Error('이미지 생성 실패'));};
+    im.src=url;
+  });
 }
 
 /* ---------- 상세페이지 ---------- */

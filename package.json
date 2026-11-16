@@ -1,9 +1,0 @@
-{
-  "name": "ilhanun-bejjangi",
-  "version": "1.0.0",
-  "private": true,
-  "description": "AI 상세페이지 생성기 (일하는 베짱이) — OpenAI + Vercel",
-  "engines": {
-    "node": ">=18"
-  }
-}
